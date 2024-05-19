@@ -27,6 +27,8 @@ fapp.add_middleware(
                     increase_expiry=datetime.timedelta(minutes=30)
                 ),
         )
+
+"""
 #
 # This middleware sometimes causes issues when using Chrome.
 #
@@ -35,6 +37,7 @@ fapp.add_middleware(
         # we're using cookies.
             CSRFMiddleware,allow_form_param=True,
         )
+"""
 
 fapp.mount('/admin/',
             create_admin(
