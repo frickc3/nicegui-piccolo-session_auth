@@ -5,45 +5,48 @@
 1.  Clone this repository to your local device.  
     **git clone https://github.com/frickc3/nicegui-piccolo-session_auth.git**
 
-2.  **cd nicegui-piccolo-session_auth**
+2.  Change into that directory.  
+    **cd nicegui-piccolo-session_auth**
 
 3.  Create a virtual environment.  
-    python -m venv .venv
+    **python -m venv .venv**
 
 4.  Activate that environment.  
-    .venv\scripts\activate
+    **.venv\scripts\activate**
 
 5.  Install the required packages.  
-    pip install -r requirements.txt
+    **pip install -r requirements.txt**
 
-8.  Run all the migrations.  
-    piccolo migrations forward all  
+6.  Run all the migrations.  
+    ```
     piccolo migrations forward user  
     piccolo migrations forward session_auth  
+    ```
 
-9.  Create the new administrator user.  
+7.  Create the new administrator user.  
+    ```
     piccolo user create
 
-    Enter username ():
-    piccolo
-    Enter email:
-    piccolo@example.com
-    Enter password:
-    piccolo123
-    Confirm password:
-    piccolo123
-    Admin user? Enter y or n:
-    y
-    Superuser? Enter y or n:
-    y
-    Active? Enter y or n:
-    y
-    Created User 1
+        Enter username ():
+        piccolo
+        Enter email:
+        piccolo@example.com
+        Enter password:
+        piccolo123
+        Confirm password:
+        piccolo123
+        Admin user? Enter y or n:
+        y
+        Superuser? Enter y or n:
+        y
+        Active? Enter y or n:
+        y
+        Created User 1
+    ```
 
-10. Startup the web server.  
-    python main.py
+8. Startup the web server.  
+    **python main.py**
 
-11. Goto http://localhost:8080  
+9. Goto **http://localhost:8080**  
 
-12. To view the defined tables use http://localhost:8080/admin/  
-
+10. The Piccolo Admin application is available at **http://localhost:8080/admin/**  
