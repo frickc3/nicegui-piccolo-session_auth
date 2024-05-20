@@ -17,7 +17,7 @@
 5.  Install the required packages.  
     **pip install -r requirements.txt**
 
-6.  Run all the migrations.  
+6.  Run all the migrations (also creates the SQLite database).  
     ```
     piccolo migrations forward user  
     piccolo migrations forward session_auth  
@@ -44,8 +44,8 @@
         Created User 1
     ```
 
-8. Startup the web server.  
-    **python main.py**
+8. Startup the dev web server.  
+    **fastapi dev --port=8080**
 
 9. Goto **http://localhost:8080**  
 

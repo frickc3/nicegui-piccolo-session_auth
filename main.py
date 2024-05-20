@@ -1,10 +1,9 @@
 import os
-import argparse
 import datetime
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from icecream import install, ic
-from nicegui import APIRouter, app, ui
+from nicegui import APIRouter, ui
 
 from piccolo_admin.endpoints import create_admin
 from piccolo_api.csrf.middleware import CSRFMiddleware
@@ -15,11 +14,14 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 
 from app.piccolo_app import APP_CONFIG
 
-fapp = FastAPI()
+app = FastAPI()
+
+install()
+ic.disable()                        # comment this out for debugging
 
 router = APIRouter(prefix='')
 
-fapp.add_middleware(
+app.add_middleware(
             AuthenticationMiddleware,
                 backend=SessionsAuthBackend(
                     admin_only=False,
@@ -28,24 +30,20 @@ fapp.add_middleware(
                 ),
         )
 
-"""
-#
-# This middleware sometimes causes issues when using Chrome.
-#
-fapp.add_middleware(
+app.add_middleware(
         # CSRF middleware provides additional protection for older browsers, as
         # we're using cookies.
             CSRFMiddleware,allow_form_param=True,
         )
-"""
 
-fapp.mount('/admin/',
+
+app.mount('/admin/',
             create_admin(
                     tables=APP_CONFIG.table_classes,
             ),
         )
 
-fapp.mount(
+app.mount(
         path="/login/",
         app=session_login(
             session_table=SessionsBase,
@@ -53,7 +51,7 @@ fapp.mount(
             ),
         )
 
-fapp.add_route(
+app.add_route(
             path="/logout/",
             route=session_logout(session_table=SessionsBase,
                                 redirect_to='/'),
@@ -76,7 +74,6 @@ def root(request: Request):
 @router.page('/base')
 def base(request: Request):
     ic()
-    ic(request.url)
     if request.user.user == None:
         return RedirectResponse('/login/?nextURL=/base')
     ui.label('Base page - authenticated required!')
@@ -96,44 +93,8 @@ def sub_page(request: Request):
         ui.button('Logout', on_click=lambda: ui.navigate.to('/logout/'))
         ui.button('base page', on_click=lambda: ui.navigate.to('/base'))    
 
-fapp.include_router(router)
+app.include_router(router)
 
-ui.run_with(fapp,
+ui.run_with(app,
         storage_secret=os.getenv('STORAGE_SECRET'),
     )
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("-p", "--port", help="http Port",
-                         default=8080, action="store")
-
-    parser.add_argument("-v", "--verbose", help="Print detailed debugging information.",
-                        action="store_true")
-
-    parser.add_argument("-r", "--reload", help="Reload on changes, default False.",
-                        action="store_true", default=False)
-
-    parser.add_argument("-d", "--debug", help="Print debugging information.",
-                        action="store_true", default=False)
-
-    args = parser.parse_args()
-    log_level = "info"
-    if args.verbose:
-        log_level = "debug"
-    port = int(args.port)
-
-    #  Used for printing debug information
-    install()
-    ic.disable()
-
-    if args.debug:
-        ic.enable()
-        os.environ['IC_DEBUG'] = 'True'
-    ic(args)
-
-    uvicorn.run("main:fapp", host="127.0.0.1", port=port, reload=args.reload,
-                log_level=log_level)
