@@ -2,6 +2,8 @@
 
 ## Example NiceGUI Project using Piccolo as the ORM and Piccolo-api for session authentication.
 
+## Piccolo Session Authentication changes is to allow for ?nextURL= to be specified on redirect to /login/.
+
 1.  Clone this repository to your local device.  
     **git clone https://github.com/frickc3/nicegui-piccolo-session_auth.git**
 
