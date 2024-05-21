@@ -11,6 +11,7 @@ from session_auth.endpoints import session_login, session_logout
 from piccolo_api.session_auth.middleware import SessionsAuthBackend
 from piccolo_api.session_auth.tables import SessionsBase
 from starlette.middleware.authentication import AuthenticationMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.piccolo_app import APP_CONFIG
 
@@ -20,6 +21,25 @@ install()
 ic.disable()                        # comment this out for debugging
 
 router = APIRouter(prefix='')
+
+unrestricted_page_routes = {'/login/', '/', '/sw.js'}
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    """
+    This middleware restricts access to all NiceGUI pages.
+
+    It redirects the user to the login page if they are not authenticated.
+    """
+    async def dispatch(self, request: Request, call_next):
+        ic()
+        ic(request.url.path)
+        if request.url.path in unrestricted_page_routes:
+            return await call_next(request)
+        if request.user.user and request.user.is_authenticated:
+            return await call_next(request)
+        return RedirectResponse('/login/?nextURL='+str(request.url))
+
+app.add_middleware(AuthMiddleware)
 
 app.add_middleware(
             AuthenticationMiddleware,
@@ -35,7 +55,6 @@ app.add_middleware(
         # we're using cookies.
             CSRFMiddleware,allow_form_param=True,
         )
-
 
 app.mount('/admin/',
             create_admin(
@@ -74,8 +93,6 @@ def root(request: Request):
 @router.page('/base')
 async def base(request: Request):
     ic()
-    if request.user.user == None:
-        return RedirectResponse('/login/?nextURL=/base')
     ui.label('Base page - authenticated required!')
     ui.label('You are logged in as user: %s ' % request.user.username)
     with ui.row():
@@ -85,8 +102,6 @@ async def base(request: Request):
 @router.page('/sub_page')
 async def sub_page(request: Request):
     ic()
-    if request.user.user == None:
-        return RedirectResponse('/login/?nextURL=/sub_page')
     ui.label('sub page - authenticated required!')
     ui.label('You are logged in as user: %s ' % request.user.username)
     with ui.row():
