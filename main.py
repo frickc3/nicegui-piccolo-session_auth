@@ -72,7 +72,7 @@ def root(request: Request):
 
 
 @router.page('/base')
-def base(request: Request):
+async def base(request: Request):
     ic()
     if request.user.user == None:
         return RedirectResponse('/login/?nextURL=/base')
@@ -83,7 +83,7 @@ def base(request: Request):
         ui.button('sub_page', on_click=lambda: ui.navigate.to('/sub_page'))
 
 @router.page('/sub_page')
-def sub_page(request: Request):
+async def sub_page(request: Request):
     ic()
     if request.user.user == None:
         return RedirectResponse('/login/?nextURL=/sub_page')
